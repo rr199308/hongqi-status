@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hongqi статусы</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Golos+Text:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f6f4f3; --panel:#ffffff; --line:#e6e0de; --fg:#1d1a19; --muted:#6f6764; --accent:#a8232b; --accent-fg:#ffffff; --accent-soft:#f7e6e6;
+  --c-dev-bg:#e8edf4; --c-dev-fg:#33507a; --c-stage-bg:#fbefd6; --c-stage-fg:#7a5310; --c-prod-bg:#e2f1e4; --c-prod-fg:#256132; --c-todo-bg:#eeeae8; --c-todo-fg:#5a5350; --c-warn:#b0600c; --c-err:#b3261e;
+  --display:"Onest",system-ui,sans-serif; --body:"Golos Text",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#161312; --panel:#1f1b1a; --line:#342d2b; --fg:#f1ecea; --muted:#a59c98; --accent:#e0555c; --accent-fg:#1a0e0e; --accent-soft:#3a1e20;
+  --c-dev-bg:#1f2a3a; --c-dev-fg:#a9c2e6; --c-stage-bg:#3a2d12; --c-stage-fg:#f0cd86; --c-prod-bg:#183020; --c-prod-fg:#9fd8ab; --c-todo-bg:#2b2523; --c-todo-fg:#c3bab6; --c-warn:#f0a050; --c-err:#ff8a80; color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:12px}
+.mark{width:36px;height:36px;border-radius:8px;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font-family:var(--display);font-weight:600;font-size:18px}
+h1{font-family:var(--display);font-weight:600;font-size:22px;margin:0}
+h2{font-family:var(--display);font-weight:500;font-size:16px;margin:0}
+.sub,.hint{color:var(--muted);font-size:13px}
+.conn{display:flex;align-items:center;gap:6px;font-size:13px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--panel);cursor:pointer;color:var(--fg);font-family:inherit}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.dot.ok{background:var(--c-prod-fg)} .dot.bad{background:var(--c-err)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.settings{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) auto;gap:12px;align-items:end}
+@media (max-width:760px){.settings{grid-template-columns:minmax(0,1fr)}}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.lbl{font-family:var(--display);font-weight:500;font-size:14px}
+input[type=text],input[type=password],textarea{width:100%;font-family:var(--mono);font-size:14px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
+textarea{resize:vertical}
+.match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:16px}
+@media (max-width:700px){.match{grid-template-columns:minmax(0,1fr)}}
+.out{flex:1;min-height:92px;font-family:var(--mono);font-size:15px;line-height:1.7;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);word-break:break-word}
+.out.empty{color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.btn{border-radius:8px;padding:9px 16px;font:inherit;font-weight:500;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--fg)}
+.btn.dark{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px}
+.toggle{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);cursor:pointer}
+.acts{margin-left:auto;display:flex;flex-wrap:wrap;gap:10px}
+@media (max-width:900px){.acts{margin-left:0}}
+.act{border-radius:8px;padding:10px 20px;font:inherit;font-weight:500;cursor:pointer;border:1px solid transparent;min-width:130px}
+.a-stage{background:var(--c-stage-bg);color:var(--c-stage-fg);border-color:var(--c-stage-fg)}
+.a-prod{background:var(--c-prod-bg);color:var(--c-prod-fg);border-color:var(--c-prod-fg)}
+.act:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.progress{display:flex;align-items:center;gap:10px;font-size:14px;padding:10px 12px;border-radius:8px;background:var(--accent-soft)}
+.progress.err{color:var(--c-err)}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--accent);border-top-color:transparent;animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;min-width:0}
+.cardhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:680px}
+th{text-align:left;font-weight:500;color:var(--muted);font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:10px 12px;border-bottom:1px solid var(--line)}
+td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tr.on td{background:color-mix(in srgb,var(--accent-soft) 45%,transparent)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.key{font-family:var(--mono);font-size:13px;color:var(--accent);text-decoration:none;white-space:nowrap}
+.key:hover{text-decoration:underline}
+.task{max-width:380px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.pill{display:inline-block;font-size:12px;font-weight:500;padding:2px 9px;border-radius:999px;white-space:nowrap;margin:0 4px 4px 0}
+.p-dev{background:var(--c-dev-bg);color:var(--c-dev-fg)} .p-stage{background:var(--c-stage-bg);color:var(--c-stage-fg)} .p-prod{background:var(--c-prod-bg);color:var(--c-prod-fg)} .p-todo{background:var(--c-todo-bg);color:var(--c-todo-fg)}
+.flag{display:block;font-size:12px;color:var(--c-warn);margin-top:3px}
+.empty-state{padding:28px 16px;color:var(--muted);text-align:center}
+.log{padding:6px 16px 14px;display:flex;flex-direction:column}
+.run{padding:12px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px;color:var(--fg);text-decoration:none}
+.run:last-child{border-bottom:0}
+.run .t{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.run .w{font-size:14px;word-break:break-word}
+.ok-t{color:var(--c-prod-fg)} .bad-t{color:var(--c-err)}
+.note{font-size:13px;color:var(--muted);padding:12px 16px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="mark" aria-hidden="true">红</div>
+      <div>
+        <h1>Hongqi статусы</h1>
+        <div class="sub">Правки для разработки → Jira, через GitHub Actions</div>
+      </div>
+    </div>
+    <button class="conn" id="connBtn" type="button"><span class="dot" id="connDot"></span><span id="connText">GitHub не подключён</span></button>
+  </header>
+
+  <section class="panel" id="settings" aria-label="Подключение" hidden>
+    <div class="settings">
+      <div class="field">
+        <label class="lbl" for="repo">Репозиторий</label>
+        <input type="text" id="repo" placeholder="owner/hongqi-jira-sync" autocomplete="off">
+      </div>
+      <div class="field">
+        <label class="lbl" for="token">Ваш GitHub-токен</label>
+        <input type="password" id="token" placeholder="github_pat_…" autocomplete="off">
+        <span class="hint">Хранится только в этом браузере. Нужны права Actions: Read and write и Contents: Read на этот репозиторий.</span>
+      </div>
+      <div class="row">
+        <button class="btn dark" id="save" type="button">Подключить</button>
+        <button class="btn" id="forget" type="button">Забыть токен</button>
+      </div>
+    </div>
+    <div class="hint" id="setErr" style="color:var(--c-err);margin-top:8px"></div>
+  </section>
+
+  <section class="panel match" aria-label="Сопоставление">
+    <div class="field">
+      <label for="input" class="lbl">Номера задач из Google Таблицы</label>
+      <textarea id="input" rows="7" placeholder="976&#10;979&#10;984"></textarea>
+      <div class="hint">По одному в строке или через запятую</div>
+      <div class="row"><button class="btn dark" id="find" type="button">Найти в Jira</button><span class="hint" id="ierr" style="color:var(--c-warn)"></span></div>
+    </div>
+    <div class="field">
+      <div class="lbl">Задачи в Jira</div>
+      <div class="out empty" id="out" aria-live="polite">Здесь появится список задач Jira через запятую</div>
+      <div class="row"><button class="btn" id="copy" type="button" disabled>Скопировать</button><span class="hint" id="miss"></span></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-label="Смена статуса">
+    <div class="bar">
+      <div><div class="lbl">Поменять статус</div><div class="hint" id="selInfo">Выбрано: 0</div></div>
+      <label class="toggle"><input type="checkbox" id="dry"> Пробный прогон, без записи</label>
+      <div class="acts">
+        <button class="act a-stage" data-st="Done Stage" type="button" disabled>Done Stage</button>
+        <button class="act a-prod" data-st="Done Prod" type="button" disabled>Done Prod</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="progress" id="progress" hidden></div>
+
+  <div class="grid">
+    <section class="card" aria-label="Задачи">
+      <div class="cardhead"><h2>Задачи из таблицы</h2><span class="hint" id="count"></span></div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th><input type="checkbox" id="all" aria-label="Выбрать все"></th><th>№</th><th>Задача</th><th>Jira</th><th>Статус в Jira</th><th>В таблице</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="empty">Вставьте номера задач и нажмите «Найти в Jira»</div>
+      <div class="note">Задачи находятся в Jira по номеру в начале названия. Если номера нет, поиск идёт по тексту описания, и такая строка помечается для проверки.</div>
+    </section>
+
+    <aside class="card" aria-label="Журнал">
+      <div class="cardhead"><h2>Журнал прогонов</h2><button class="btn" id="reload" type="button" style="padding:4px 10px;font-size:13px">Обновить</button></div>
+      <div class="log" id="log"><div class="hint" style="padding:12px 0">Подключите GitHub, чтобы увидеть прогоны</div></div>
+      <div class="note">Сайт не хранит ключи к Jira и Google. Кнопки запускают workflow в GitHub, а ключи лежат в секретах репозитория.</div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const WORKFLOW = 'sync.yml';
+const DEFAULT_REPO = 'rr199308/hongqi-jira-sync';
+const POLL_MS = 4000, POLL_LIMIT_MS = 6 * 60 * 1000;
+const $ = id => document.getElementById(id);
+const LS = {
+  get(k){ try { return localStorage.getItem(k) || ''; } catch(e){ return ''; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
+  del(k){ try { localStorage.removeItem(k); } catch(e){} }
+};
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function guessRepo(){
+  const h = location.hostname;
+  if (h.endsWith('.github.io')) {
+    const repo = location.pathname.split('/').filter(Boolean)[0];
+    if (repo) return h.split('.')[0] + '/' + repo;
+  }
+  return '';
+}
+
+const state = { repo: LS.get('gh_repo') || DEFAULT_REPO || guessRepo(), token: LS.get('gh_token'), branch: 'main', jiraUrl: '', items: [], sel: new Set(), busy: false };
+
+async function gh(path, opts = {}) {
+  const headers = { 'Authorization': 'Bearer ' + state.token, 'Accept': opts.accept || 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
+  if (opts.body) headers['Content-Type'] = 'application/json';
+  return fetch('https://api.github.com' + path, { method: opts.method || 'GET', headers, body: opts.body, cache: 'no-store' });
+}
+
+function setConn(ok, text){
+  $('connDot').className = 'dot ' + (ok ? 'ok' : 'bad');
+  $('connText').textContent = text;
+}
+
+async function connect(){
+  $('setErr').textContent = '';
+  if (!state.repo || !state.token) { setConn(false, 'GitHub не подключён'); $('settings').hidden = false; updateButtons(); return false; }
+  try {
+    const r = await gh('/repos/' + state.repo);
+    if (r.status === 401) throw new Error('Токен не подходит или истёк.');
+    if (r.status === 404) throw new Error('Репозиторий не найден, или у токена нет к нему доступа.');
+    if (!r.ok) throw new Error('GitHub ответил ' + r.status);
+    const repo = await r.json();
+    state.branch = repo.default_branch;
+    const u = await gh('/user');
+    const login = u.ok ? (await u.json()).login : '';
+    setConn(true, (login ? login + ' · ' : '') + state.repo);
+    $('settings').hidden = true;
+    loadRuns();
+    updateButtons();
+    return true;
+  } catch (e) {
+    setConn(false, 'Ошибка подключения');
+    $('setErr').textContent = e.message;
+    $('settings').hidden = false;
+    updateButtons();
+    return false;
+  }
+}
+
+function parseNumbers(text){ return [...new Set((text.match(/\d+/g) || []).map(Number))]; }
+function requestId(){ return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); }
+
+function showProgress(text, kind){
+  const p = $('progress');
+  p.hidden = !text;
+  p.className = 'progress' + (kind === 'err' ? ' err' : '');
+  p.innerHTML = (kind === 'run' ? '<span class="spin" aria-hidden="true"></span>' : '') + '<span>' + esc(text) + '</span>';
+}
+
+async function runWorkflow(inputs, label){
+  const id = requestId();
+  state.busy = true; updateButtons();
+  const started = Date.now();
+  showProgress(label + ': запускаю workflow…', 'run');
+  try {
+    const r = await gh(`/repos/${state.repo}/actions/workflows/${WORKFLOW}/dispatches`, {
+      method: 'POST', body: JSON.stringify({ ref: state.branch, inputs: { ...inputs, request_id: id } })
+    });
+    if (r.status === 403) throw new Error('У токена нет права запускать workflow (нужно Actions: Read and write).');
+    if (r.status === 404) throw new Error('Workflow sync.yml не найден в репозитории.');
+    if (r.status !== 204) throw new Error('GitHub не запустил workflow: ' + r.status + ' ' + (await r.text()));
+    setTimeout(loadRuns, 3000);
+    while (Date.now() - started < POLL_LIMIT_MS) {
+      await new Promise(res => setTimeout(res, POLL_MS));
+      const sec = Math.round((Date.now() - started) / 1000);
+      showProgress(`${label}: жду результат, ${sec} с (обычно 30–60 с)`, 'run');
+      const f = await gh(`/repos/${state.repo}/contents/results/${id}.json?ref=results`, { accept: 'application/vnd.github.raw+json' });
+      if (f.ok) {
+        const result = await f.json();
+        loadRuns();
+        if (result.error) throw new Error(result.error);
+        showProgress('');
+        return result;
+      }
+    }
+    throw new Error('Результат не пришёл за 6 минут. Откройте прогон в журнале и посмотрите лог.');
+  } catch (e) {
+    showProgress(e.message, 'err');
+    return null;
+  } finally {
+    state.busy = false; updateButtons();
+  }
+}
+
+const pc = s => /prod/i.test(s) ? 'p-prod' : /stage/i.test(s) ? 'p-stage' : /to ?do|open/i.test(s) ? 'p-todo' : 'p-dev';
+
+function render(changed = []){
+  const tb = $('rows');
+  tb.innerHTML = state.items.map(it => {
+    const keys = it.jira.map(j => `<a class="key" href="${esc(state.jiraUrl)}/browse/${esc(j.key)}" target="_blank" rel="noopener">${esc(j.key)}</a>`).join(', ');
+    const statuses = [...new Set(it.jira.map(j => j.status))].map(s => `<span class="pill ${pc(s)}">${esc(s)}</span>`).join('');
+    const flag = !it.jira.length ? '<span class="flag">не найдено в Jira</span>' : it.matched_by === 'text' ? '<span class="flag">найдено по описанию, проверьте</span>' : '';
+    return `<tr class="${state.sel.has(it.n) ? 'on' : ''}">
+      <td><input type="checkbox" data-n="${it.n}" ${state.sel.has(it.n) ? 'checked' : ''} aria-label="Выбрать ${it.n}"></td>
+      <td class="num">${it.n}</td>
+      <td><div class="task" title="${esc(it.task)}">${esc(it.task)}</div>${flag}</td>
+      <td>${keys || '—'}</td>
+      <td>${statuses || '—'}</td>
+      <td>${it.sheet_status ? `<span class="pill ${pc(it.sheet_status)}">${esc(it.sheet_status)}</span>` : '—'}${changed.includes(it.n) ? '<span class="flag" style="color:var(--c-prod-fg)">обновлено</span>' : ''}</td></tr>`;
+  }).join('');
+  $('empty').hidden = state.items.length > 0;
+  $('count').textContent = state.items.length ? `строк: ${state.items.length}` : '';
+  $('selInfo').textContent = 'Выбрано: ' + state.sel.size;
+  $('all').checked = state.items.length > 0 && state.sel.size === state.items.length;
+  updateButtons();
+}
+
+function updateButtons(){
+  const ready = !!state.token && !!state.repo && !state.busy;
+  $('find').disabled = !ready;
+  document.querySelectorAll('.act').forEach(b => b.disabled = !ready || !state.sel.size);
+}
+
+$('find').onclick = async () => {
+  const nums = parseNumbers($('input').value);
+  if (!nums.length) { $('ierr').textContent = 'Вставьте хотя бы один номер'; return; }
+  $('ierr').textContent = '';
+  LS.set('last_numbers', $('input').value);
+  const res = await runWorkflow({ mode: 'find', numbers: nums.join(', '), status: 'Done Stage', dry_run: 'false' }, 'Поиск в Jira');
+  if (!res) return;
+  state.jiraUrl = res.jira_url;
+  state.items = res.items;
+  state.sel = new Set(res.items.map(i => i.n));
+  $('out').textContent = res.keys.length ? res.keys.join(', ') : 'Ничего не найдено';
+  $('out').classList.toggle('empty', !res.keys.length);
+  $('copy').disabled = !res.keys.length;
+  $('copy').textContent = 'Скопировать';
+  const notInJira = res.items.filter(i => !i.jira.length).map(i => i.n);
+  $('miss').textContent = `Найдено в Jira ${res.items.length - notInJira.length} из ${nums.length}`
+    + (res.missing.length ? ` · нет в таблице: ${res.missing.join(', ')}` : '')
+    + (notInJira.length ? ` · нет в Jira: ${notInJira.join(', ')}` : '');
+  render();
+};
+
+document.querySelectorAll('.act').forEach(b => b.onclick = async () => {
+  const status = b.dataset.st, dry = $('dry').checked;
+  const nums = [...state.sel].sort((a, x) => a - x);
+  const res = await runWorkflow({ mode: 'set', numbers: nums.join(', '), status, dry_run: String(dry) }, (dry ? 'Пробный прогон ' : 'Ставлю ') + status);
+  if (!res) return;
+  if (!dry) res.changes.forEach(c => { const it = state.items.find(i => i.n === c.n); if (it) it.sheet_status = c.to; });
+  render(dry ? [] : res.changes.map(c => c.n));
+  showProgress(dry
+    ? `Пробный прогон: будет изменено ${res.changes.length} строк (${res.changes.map(c => c.n).join(', ')}), в таблицу ничего не записано`
+    : `Записано в таблицу: ${status} для ${res.changes.map(c => c.n).join(', ')}`);
+});
+
+$('rows').addEventListener('change', e => {
+  const n = +e.target.dataset.n; if (!n) return;
+  e.target.checked ? state.sel.add(n) : state.sel.delete(n); render();
+});
+$('all').addEventListener('change', e => { state.items.forEach(i => e.target.checked ? state.sel.add(i.n) : state.sel.delete(i.n)); render(); });
+$('input').addEventListener('input', () => { $('ierr').textContent = ''; });
+
+$('copy').onclick = () => {
+  const t = $('out').textContent;
+  const fallback = () => { const r = document.createRange(); r.selectNodeContents($('out')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); $('copy').textContent = 'Выделено, нажмите Cmd+C'; };
+  try { navigator.clipboard.writeText(t).then(() => { $('copy').textContent = 'Скопировано'; }, fallback); } catch (e) { fallback(); }
+};
+
+$('connBtn').onclick = () => { $('settings').hidden = !$('settings').hidden; };
+$('save').onclick = () => {
+  state.repo = $('repo').value.trim().replace(/^https:\/\/github\.com\//, '').replace(/\/$/, '');
+  const t = $('token').value.trim();
+  if (t) state.token = t;
+  if (!/^[\w.-]+\/[\w.-]+$/.test(state.repo)) { $('setErr').textContent = 'Укажите репозиторий в виде owner/name'; return; }
+  if (!state.token) { $('setErr').textContent = 'Вставьте токен'; return; }
+  LS.set('gh_repo', state.repo); LS.set('gh_token', state.token);
+  $('token').value = '';
+  connect();
+};
+$('forget').onclick = () => { LS.del('gh_token'); state.token = ''; setConn(false, 'GitHub не подключён'); updateButtons(); };
+$('reload').onclick = () => loadRuns();
+
+async function loadRuns(){
+  if (!state.token || !state.repo) return;
+  const r = await gh(`/repos/${state.repo}/actions/workflows/${WORKFLOW}/runs?per_page=10`);
+  if (!r.ok) return;
+  const runs = (await r.json()).workflow_runs || [];
+  $('log').innerHTML = runs.length ? runs.map(x => {
+    const d = new Date(x.created_at);
+    const when = d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }) + ' · ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    const st = x.status !== 'completed' ? '<span>выполняется</span>' : x.conclusion === 'success' ? '<span class="ok-t">готово</span>' : `<span class="bad-t">${esc(x.conclusion)}</span>`;
+    return `<a class="run" href="${esc(x.html_url)}" target="_blank" rel="noopener"><span class="t">${when} · ${esc(x.actor?.login || '')}</span><span class="w">${esc(x.display_title)}</span><span class="hint">${st}</span></a>`;
+  }).join('') : '<div class="hint" style="padding:12px 0">Прогонов пока не было</div>';
+}
+
+$('repo').value = state.repo;
+$('input').value = LS.get('last_numbers');
+render();
+connect();
+</script>
+</body>
+</html>
